@@ -22,24 +22,24 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/passport', function () {
     $query = http_build_query([
-        'client_id'     => '5',
-        'redirect_uri'  => 'http://merry.test/callback',
+        'client_id'     => env('OAUTH_CLIENT_ID'),
+        'redirect_uri'  => env('APP_URL') . 'callback',
         'response_type' => 'code',
         'scope'         => 'profile private',
     ]);
 
-    return redirect('http://passport.test/oauth/authorize?' . $query);
+    return redirect(env('OAUTH_SERVER') . 'oauth/authorize?' . $query);
 })->name('login.passport');
 
 Route::get('/callback', function (Request $request) {
     $http = new GuzzleHttp\Client;
 
-    $response = $http->post('http://passport.test/oauth/token', [
+    $response = $http->post(env('OAUTH_SERVER') . 'oauth/token', [
         'form_params' => [
             'grant_type'    => 'authorization_code',
-            'client_id'     => '5',
-            'client_secret' => 'yAsm0A4lkQTamabBBLjAWQoZh05IBCgLHEQRE7Dc',
-            'redirect_uri'  => 'http://merry.test/callback',
+            'client_id'     => env('OAUTH_CLIENT_ID'),
+            'client_secret' => env('OAUTH_CLIENT_SECRET'),
+            'redirect_uri'  => env('APP_URL') . 'callback',
             'code'          => $request->code,
         ],
     ]);
